@@ -1,43 +1,47 @@
 """
-PyTorch Learning Platform - Single Page App with Dynamic Content
-Uses buttons for navigation instead of links
+PyTorch Learning Platform - Home Page (Streamlit)
 """
 
-import gradio as gr
-from topics.basic.topic_01_pytorch_tensors import get_topic_content as get_topic_01, QUESTIONS as questions_01
-from topics.basic.topic_02_autograd import get_topic_content as get_topic_02, QUESTIONS as questions_02
-from utils.quiz_handler import QuizHandler
+import streamlit as st
 
-# Topic metadata for navigation
-TOPICS = [
-    ("01", "Introduction to PyTorch & Tensors", get_topic_01, questions_01, None),
-    ("02", "Autograd & Backpropagation", get_topic_02, questions_02, "01"),
-    # More topics will be added here
-]
+# Page config
+st.set_page_config(
+    page_title="PyTorch Learning Platform",
+    page_icon="🔥",
+    layout="wide"
+)
 
-def create_home_content():
-    """Generate home page content."""
-    return """# 🔥 Welcome to the PyTorch Learning Platform!
+# Title
+st.title("🔥 PyTorch Learning Platform")
+st.markdown("### Master PyTorch from Basics to Advanced Transformers")
 
+st.markdown("---")
+
+# Introduction
+st.markdown("""
 Master PyTorch from basics to advanced transformer architectures. This platform focuses on **understanding WHY** each concept exists and **HOW** it connects to modern LLMs.
 
----
+**Use the sidebar** → to navigate to any topic!
+""")
 
-## 📚 Basic Level - Foundation Concepts
+st.markdown("---")
 
-**Click the navigation buttons above to access any topic:**
+# Basic Level
+st.markdown("## 📚 Basic Level - Foundation Concepts")
+st.markdown("""
+1. **Introduction to PyTorch & Tensors** 🔢
+2. **Autograd & Backpropagation** 🔄
+3. **Building Neural Networks (nn.Module)** 🧠
+4. **Loss Functions & Optimizers** 🎯
+5. **Training Your First Model** 🚀
+6. **Evaluation & Metrics** ✅
+""")
 
-1. Introduction to PyTorch & Tensors 🔢
-2. Autograd & Backpropagation 🔄
-3. Building Neural Networks (nn.Module) 🧠
-4. Loss Functions & Optimizers 🎯
-5. Training Your First Model 🚀
-6. Evaluation & Metrics ✅
+st.markdown("---")
 
----
-
-## 🧠 Intermediate Level - Practical Deep Learning
-
+# Intermediate Level
+st.markdown("## 🧠 Intermediate Level - Practical Deep Learning")
+st.markdown("""
 7. Custom Datasets & DataLoaders 📂
 8. Convolutional Neural Networks (CNNs) 🖼️
 9. Batch Normalization & Dropout 🔧
@@ -45,13 +49,14 @@ Master PyTorch from basics to advanced transformer architectures. This platform 
 11. Advanced Optimizers & Schedulers 📈
 12. Model Saving & Checkpointing 💾
 13. Introduction to Embeddings 🔤
+""")
 
----
+st.markdown("---")
 
-## ⚡ Advanced Level - Transformer Architectures & Modern LLMs
-
-**The heart of modern AI! Deep dive into transformers:**
-
+# Advanced Level
+st.markdown("## ⚡ Advanced Level - Transformer Architectures & Modern LLMs")
+st.markdown("**The heart of modern AI! Deep dive into transformers:**")
+st.markdown("""
 14. Attention Mechanism from Scratch 🎯
 15. Multi-Head Attention 🧩
 16. Positional Encoding 📍
@@ -62,142 +67,52 @@ Master PyTorch from basics to advanced transformer architectures. This platform 
 21. Flash Attention ⚡
 22. KV Cache & Efficient Inference 💨
 23. Mixture of Experts (MoE) 🎓
+""")
 
----
+st.markdown("---")
 
-## 🚀 Professional Level - Production & Optimization
-
+# Professional Level
+st.markdown("## 🚀 Professional Level - Production & Optimization")
+st.markdown("""
 24. Production-Ready Training Loop 🔄
 25. Model Optimization & Quantization 📊
 26. Distributed Training Concepts 🌐
 27. PyTorch Best Practices 📋
 28. Debugging & Profiling 🔍
 29. Deployment Strategies 🚀
+""")
 
----
+st.markdown("---")
 
-## 💡 What Makes This Platform Special?
-
+# What makes it special
+st.markdown("## 💡 What Makes This Platform Special?")
+st.markdown("""
 - **Transformer-Focused**: 10 dedicated topics on attention mechanisms and modern LLM architectures
 - **Conceptual Connections**: Understand how concepts relate to each other
 - **Hands-On Projects**: Build real projects at the end of each level
 - **CPU-Friendly**: All examples run on CPU (no GPU needed!)
 - **Simple Language**: Clear explanations of complex topics
 - **Interactive Quizzes**: Test your understanding with each topic
+""")
 
----
+st.markdown("---")
 
-## 🎯 Projects
-
+# Projects
+st.markdown("## 🎯 Projects")
+st.markdown("""
 After completing each level, build a hands-on project:
 
 - **📚 Basic**: Fashion-MNIST Classifier
 - **🧠 Intermediate**: Custom Dataset Trainer with Augmentation
 - **⚡ Advanced**: Mini-Transformer for Text Classification
 - **🚀 Professional**: Production Training Pipeline
+""")
 
----
+st.markdown("---")
 
-## 🚀 Get Started!
+# Get started
+st.info("👈 **Select a topic from the sidebar to begin your learning journey!**")
 
-Use the navigation buttons above to jump to any topic. Topics currently available: 1, 2. More coming soon!
-"""
-
-def create_topic_page(topic_id):
-    """Create content for a specific topic."""
-    for tid, title, get_content, questions, prev_id in TOPICS:
-        if tid == topic_id:
-            topic_data = get_content()
-            content = topic_data['content']
-
-            # Add navigation info
-            nav_info = f"\n\n---\n\n**Topic {tid}**: {title}\n\n"
-            if prev_id:
-                nav_info += f"⬅️ Previous topic available | "
-            nav_info += "🏠 Home | ➡️ Next topic available\n\n---\n\n"
-
-            return nav_info + content, questions, title
-
-    return create_home_content(), [], "Home"
-
-def render_quiz(questions):
-    """Render quiz questions as HTML."""
-    if not questions:
-        return ""
-
-    quiz_html = "\n\n---\n\n## 📝 Knowledge Check\n\n"
-    for idx, q in enumerate(questions):
-        quiz_html += f"\n### Question {idx + 1}\n\n**{q.question_text}**\n\n"
-        if q.question_type.value == "multiple_choice":
-            for opt in q.options:
-                quiz_html += f"- {opt}\n"
-
-    return quiz_html
-
-def main():
-    """Create the main Gradio interface."""
-
-    with gr.Blocks(title="🔥 PyTorch Learning Platform", theme=gr.themes.Soft()) as app:
-        # State to track current page
-        current_topic = gr.State("home")
-
-        # Header
-        gr.Markdown("# 🔥 PyTorch Learning Platform")
-        gr.Markdown("### Master PyTorch from Basics to Advanced Transformers")
-
-        # Navigation bar
-        with gr.Row():
-            home_btn = gr.Button("🏠 Home", size="sm")
-            topic_01_btn = gr.Button("01. PyTorch & Tensors", size="sm")
-            topic_02_btn = gr.Button("02. Autograd", size="sm")
-
-        gr.Markdown("---")
-
-        # Main content area
-        content_area = gr.Markdown(value=create_home_content())
-
-        # Quiz area (initially hidden)
-        with gr.Column(visible=False) as quiz_section:
-            gr.Markdown("## 📝 Knowledge Check")
-            quiz_questions = gr.Column()
-
-        # Navigation functions
-        def go_home():
-            return create_home_content(), "home", gr.Column(visible=False)
-
-        def go_to_topic(topic_id):
-            content, questions, title = create_topic_page(topic_id)
-            quiz_html = render_quiz(questions)
-            full_content = content + quiz_html
-
-            # Show quiz section if there are questions
-            show_quiz = len(questions) > 0
-            return full_content, topic_id, gr.Column(visible=show_quiz)
-
-        # Wire up navigation
-        home_btn.click(
-            go_home,
-            outputs=[content_area, current_topic, quiz_section]
-        )
-
-        topic_01_btn.click(
-            lambda: go_to_topic("01"),
-            outputs=[content_area, current_topic, quiz_section]
-        )
-
-        topic_02_btn.click(
-            lambda: go_to_topic("02"),
-            outputs=[content_area, current_topic, quiz_section]
-        )
-
-        # Footer
-        gr.Markdown("""
-        ---
-        **Built with ❤️ using Gradio** | Focus on Transformers & Modern LLM Architectures
-        """)
-
-    return app
-
-if __name__ == "__main__":
-    app = main()
-    app.launch()
+# Footer
+st.markdown("---")
+st.markdown("**Built with ❤️ using Streamlit** | Focus on Transformers & Modern LLM Architectures")

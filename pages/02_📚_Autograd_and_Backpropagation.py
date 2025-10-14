@@ -1,15 +1,18 @@
 """
-Topic 2: Autograd & Backpropagation
-Level: Basic
+Topic 2: Autograd & Backpropagation (Basic Level)
 """
 
-from utils.quiz_handler import QuizHandler, create_definition_question, create_why_question
+import streamlit as st
 
-TOPIC_ID = "basic_02_autograd"
-TITLE = "Autograd & Backpropagation 🔄"
-DESCRIPTION = "Understand automatic differentiation and how PyTorch computes gradients"
+# Page config
+st.set_page_config(
+    page_title="02 - Autograd & Backpropagation",
+    page_icon="🔄",
+    layout="wide"
+)
 
-CONTENT = """
+# Main content
+st.markdown("""
 # Autograd & Backpropagation 🔄
 
 ## What is Autograd?
@@ -247,27 +250,6 @@ print(f"y_detached requires_grad: {y_detached.requires_grad}")  # False
 
 ---
 
-## Higher-Order Gradients
-
-You can even compute gradients of gradients!
-
-```python
-import torch
-
-x = torch.tensor([2.0], requires_grad=True)
-y = x ** 3
-
-# First derivative
-grad1 = torch.autograd.grad(y, x, create_graph=True)[0]
-print(f"dy/dx = {grad1}")  # 3x^2 = 12
-
-# Second derivative
-grad2 = torch.autograd.grad(grad1, x)[0]
-print(f"d²y/dx² = {grad2}")  # 6x = 12
-```
-
----
-
 ## Connection to Neural Networks 🎯
 
 **How autograd enables neural network training:**
@@ -314,44 +296,85 @@ for name, param in model.named_parameters():
 ## Next Steps 🚀
 
 Now that you understand how PyTorch computes gradients, you're ready to learn about **Neural Networks (nn.Module)** - where we'll use autograd to train actual models!
-"""
+""")
 
-QUESTIONS = [
-    QuizHandler.create_multiple_choice(
-        question="Why is autograd essential for training neural networks?",
-        options=[
+# Quiz section
+st.markdown("---")
+st.markdown("## 📝 Knowledge Check")
+st.markdown("Test your understanding with these questions:")
+
+# Quiz questions
+questions = [
+    {
+        "type": "multiple_choice",
+        "question": "Why is autograd essential for training neural networks?",
+        "options": [
             "It automatically computes gradients for all parameters, making backpropagation possible",
             "It makes the forward pass faster",
             "It reduces memory usage during training",
             "It converts tensors to NumPy arrays"
         ],
-        correct_answer="It automatically computes gradients for all parameters, making backpropagation possible",
-        explanation="Autograd automatically calculates derivatives using the chain rule, which is essential for backpropagation. Manual gradient computation for millions of parameters would be impractical!"
-    ),
-
-    create_definition_question(
-        concept="a computational graph in PyTorch",
-        correct_definition="A dynamic graph that tracks operations on tensors to enable automatic differentiation",
-        wrong_definitions=[
+        "correct": "It automatically computes gradients for all parameters, making backpropagation possible",
+        "explanation": "Autograd automatically calculates derivatives using the chain rule, which is essential for backpropagation. Manual gradient computation for millions of parameters would be impractical!"
+    },
+    {
+        "type": "multiple_choice",
+        "question": "What is a computational graph in PyTorch?",
+        "options": [
+            "A dynamic graph that tracks operations on tensors to enable automatic differentiation",
             "A visualization tool for plotting neural network architectures",
             "A static graph defined before execution like in TensorFlow 1.x",
             "A performance profiling tool for PyTorch operations"
         ],
-        explanation="PyTorch builds computational graphs dynamically as operations execute. This graph records what operations were performed so gradients can be computed via backpropagation."
-    ),
-
-    create_why_question(
-        concept="zeroing gradients before each backward pass",
-        model_answer="Gradients accumulate by default in PyTorch. If you don't zero them, new gradients will be added to old ones, leading to incorrect gradient values and poor training. Using `optimizer.zero_grad()` or `tensor.grad.zero_()` ensures you start fresh each iteration.",
-        explanation="This is one of the most common bugs in PyTorch! Always call `optimizer.zero_grad()` at the start of your training loop."
-    )
+        "correct": "A dynamic graph that tracks operations on tensors to enable automatic differentiation",
+        "explanation": "PyTorch builds computational graphs dynamically as operations execute. This graph records what operations were performed so gradients can be computed via backpropagation."
+    },
+    {
+        "type": "open_ended",
+        "question": "Why do we need to zero gradients before each backward pass in a training loop?",
+        "model_answer": "Gradients accumulate by default in PyTorch. If you don't zero them, new gradients will be added to old ones, leading to incorrect gradient values and poor training. Using `optimizer.zero_grad()` or `tensor.grad.zero_()` ensures you start fresh each iteration.",
+        "explanation": "This is one of the most common bugs in PyTorch! Always call `optimizer.zero_grad()` at the start of your training loop."
+    },
+    {
+        "type": "open_ended",
+        "question": "Explain the purpose of `requires_grad=True` in your own words.",
+        "model_answer": "Setting `requires_grad=True` on a tensor tells PyTorch to track all operations performed on that tensor so it can compute gradients during backpropagation. This is typically set for model parameters (weights and biases) but not for input data. It enables the automatic differentiation system to build the computational graph needed for training.",
+        "explanation": "Model answer: Setting `requires_grad=True` enables gradient tracking for that tensor, allowing PyTorch to build the computational graph necessary for automatic differentiation."
+    }
 ]
 
-def get_topic_content():
-    return {
-        'id': TOPIC_ID,
-        'title': TITLE,
-        'description': DESCRIPTION,
-        'content': CONTENT,
-        'questions': QUESTIONS
-    }
+for idx, q in enumerate(questions):
+    st.markdown(f"### Question {idx + 1}")
+    st.markdown(f"**{q['question']}**")
+
+    if q["type"] == "multiple_choice":
+        user_answer = st.radio(
+            "Select your answer:",
+            options=q["options"],
+            key=f"q{idx}",
+            index=None
+        )
+
+        if st.button(f"Check Answer {idx + 1}", key=f"btn{idx}"):
+            if user_answer:
+                if user_answer == q["correct"]:
+                    st.success(f"✅ Correct! {q['explanation']}")
+                else:
+                    st.error(f"❌ Incorrect. {q['explanation']}")
+            else:
+                st.warning("Please select an answer first!")
+
+    elif q["type"] == "open_ended":
+        user_answer = st.text_area(
+            "Your answer:",
+            key=f"q{idx}_text",
+            height=100
+        )
+
+        if st.button(f"Show Model Answer {idx + 1}", key=f"btn{idx}"):
+            st.info(f"**Model Answer**: {q['model_answer']}\n\n{q['explanation']}")
+
+    st.markdown("---")
+
+# Navigation
+st.info("👈 Use the sidebar to navigate to the next topic: **03 - Building Neural Networks**")

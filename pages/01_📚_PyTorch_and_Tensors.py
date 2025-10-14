@@ -1,17 +1,21 @@
 """
-Topic 1: Introduction to PyTorch & Tensors
-Level: Basic
+Topic 1: Introduction to PyTorch & Tensors (Basic Level)
 """
 
-from utils.quiz_handler import QuizHandler, create_definition_question, create_code_question
+import streamlit as st
+import sys
+sys.path.append('.')
+from utils.quiz_handler import QuizHandler
 
-# Topic metadata
-TOPIC_ID = "basic_01_pytorch_tensors"
-TITLE = "Introduction to PyTorch & Tensors 🔢"
-DESCRIPTION = "Learn what PyTorch is, why it was created, and understand the fundamental building block: tensors"
+# Page config
+st.set_page_config(
+    page_title="01 - PyTorch & Tensors",
+    page_icon="🔢",
+    layout="wide"
+)
 
 # Main content
-CONTENT = """
+st.markdown("""
 # Introduction to PyTorch & Tensors 🔢
 
 ## What is PyTorch?
@@ -252,53 +256,75 @@ Understanding tensors is the foundation for everything else in PyTorch! 🎯
 ## Next Steps 🚀
 
 In the next topic, we'll learn about **Autograd** - PyTorch's automatic differentiation engine that makes training neural networks possible! This builds directly on tensors.
-"""
+""")
+
+# Quiz section
+st.markdown("---")
+st.markdown("## 📝 Knowledge Check")
+st.markdown("Test your understanding with these questions:")
 
 # Quiz questions
-QUESTIONS = [
-    QuizHandler.create_multiple_choice(
-        question="Why was PyTorch created with dynamic computational graphs?",
-        options=[
+questions = [
+    {
+        "type": "multiple_choice",
+        "question": "Why was PyTorch created with dynamic computational graphs?",
+        "options": [
             "To make debugging easier and allow flexible model architectures",
             "To make models run faster on CPUs",
             "To reduce memory usage",
             "To support only convolutional neural networks"
         ],
-        correct_answer="To make debugging easier and allow flexible model architectures",
-        explanation="Dynamic graphs are built on-the-fly during execution, making debugging much easier than static graphs. They also allow for more flexible and experimental architectures, which is why researchers love PyTorch!"
-    ),
-
-    create_definition_question(
-        concept="a tensor in PyTorch",
-        correct_definition="A multi-dimensional array that can run operations on GPUs",
-        wrong_definitions=[
+        "correct": "To make debugging easier and allow flexible model architectures",
+        "explanation": "Dynamic graphs are built on-the-fly during execution, making debugging much easier than static graphs. They also allow for more flexible and experimental architectures, which is why researchers love PyTorch!"
+    },
+    {
+        "type": "multiple_choice",
+        "question": "What is a tensor in PyTorch?",
+        "options": [
+            "A multi-dimensional array that can run operations on GPUs",
             "A programming function that trains neural networks",
             "A type of neural network architecture",
             "A GPU acceleration library"
         ],
-        explanation="Tensors are the fundamental data structure in PyTorch - they're like NumPy arrays but with GPU support and automatic differentiation capabilities."
-    ),
-
-    create_code_question(
-        question="Which code correctly creates a 2×3 tensor filled with zeros?",
-        code_options=[
+        "correct": "A multi-dimensional array that can run operations on GPUs",
+        "explanation": "Tensors are the fundamental data structure in PyTorch - they're like NumPy arrays but with GPU support and automatic differentiation capabilities."
+    },
+    {
+        "type": "multiple_choice",
+        "question": "Which code correctly creates a 2×3 tensor filled with zeros?",
+        "options": [
             "torch.zeros(2, 3)",
             "torch.zero([2, 3])",
             "torch.empty(2, 3)",
             "torch.tensor([[0, 0, 0], [0, 0, 0]])"
         ],
-        correct_code="torch.zeros(2, 3)",
-        explanation="torch.zeros(rows, cols) is the standard way to create a tensor filled with zeros. While torch.tensor([[0, 0, 0], [0, 0, 0]]) also works, torch.zeros() is more concise and efficient."
-    )
+        "correct": "torch.zeros(2, 3)",
+        "explanation": "torch.zeros(rows, cols) is the standard way to create a tensor filled with zeros. While torch.tensor([[0, 0, 0], [0, 0, 0]]) also works, torch.zeros() is more concise and efficient."
+    }
 ]
 
+for idx, q in enumerate(questions):
+    st.markdown(f"### Question {idx + 1}")
+    st.markdown(f"**{q['question']}**")
 
-def get_topic_content():
-    """Return the complete topic content."""
-    return {
-        'id': TOPIC_ID,
-        'title': TITLE,
-        'description': DESCRIPTION,
-        'content': CONTENT,
-        'questions': QUESTIONS
-    }
+    if q["type"] == "multiple_choice":
+        user_answer = st.radio(
+            "Select your answer:",
+            options=q["options"],
+            key=f"q{idx}",
+            index=None
+        )
+
+        if st.button(f"Check Answer {idx + 1}", key=f"btn{idx}"):
+            if user_answer:
+                if user_answer == q["correct"]:
+                    st.success(f"✅ Correct! {q['explanation']}")
+                else:
+                    st.error(f"❌ Incorrect. {q['explanation']}")
+            else:
+                st.warning("Please select an answer first!")
+
+    st.markdown("---")
+
+# Navigation
+st.info("👈 Use the sidebar to navigate to the next topic: **02 - Autograd & Backpropagation**")

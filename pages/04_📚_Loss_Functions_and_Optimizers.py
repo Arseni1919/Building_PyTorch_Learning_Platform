@@ -1,14 +1,18 @@
 """
-Topic 4: Loss Functions & Optimizers
+Topic 4: Loss Functions & Optimizers - Basic Level
 """
 
-from utils.quiz_handler import QuizHandler, Question, QuestionType
+import streamlit as st
 
-TOPIC_ID = "04_loss_optimizers"
-TITLE = "Loss Functions & Optimizers"
-DESCRIPTION = "Understand how loss functions measure error and optimizers update weights"
+# Page config
+st.set_page_config(
+    page_title="04 - Loss Functions & Optimizers",
+    page_icon="🎯",
+    layout="wide"
+)
 
-CONTENT = """
+# Main content
+st.markdown("""
 # Loss Functions & Optimizers 🎯
 
 ## The Learning Loop
@@ -224,7 +228,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)  # ✅
 **Rules of thumb**:
 - Adam: Start with `lr=0.001` (or `1e-3`)
 - SGD: Start with `lr=0.01` (needs higher values)
-- Use learning rate schedulers to decrease lr over time (Topic 11)
+- Use learning rate schedulers to decrease lr over time (covered in Intermediate level)
 
 ---
 
@@ -269,7 +273,7 @@ optimizer = optim.AdamW(
 
 ---
 
-## Key Takeaways
+## Key Takeaways 💡
 
 ✅ **Loss functions** measure prediction error (lower is better)
 ✅ **Optimizers** update weights using gradients to minimize loss
@@ -279,100 +283,80 @@ optimizer = optim.AdamW(
 ✅ Modern transformers use AdamW + CrossEntropyLoss
 
 **Next step**: Put everything together by training your first model!
-"""
+""")
 
-# Create quiz questions
-def create_definition_question(term, correct_answer):
-    """Helper for open-ended definition questions"""
-    return Question(
-        question_type=QuestionType.OPEN_ENDED,
-        question_text=f"Explain what {term} is in your own words.",
-        correct_answer=correct_answer,
-        explanation=f"Model answer: {correct_answer}"
-    )
+# Quiz section
+st.markdown("---")
+st.markdown("## 📝 Knowledge Check")
 
-def create_why_question(concept, model_answer):
-    """Helper for 'why' questions"""
-    return Question(
-        question_type=QuestionType.OPEN_ENDED,
-        question_text=f"Why do we need {concept}?",
-        correct_answer=model_answer,
-        explanation=f"Model answer: {model_answer}"
-    )
-
-def create_code_question(task, model_answer):
-    """Helper for code-based questions"""
-    return Question(
-        question_type=QuestionType.OPEN_ENDED,
-        question_text=task,
-        correct_answer=model_answer,
-        explanation=f"Model answer: {model_answer}"
-    )
-
-QUESTIONS = [
-    QuizHandler.create_multiple_choice(
-        question_text="What does CrossEntropyLoss expect as input?",
-        options=[
+questions = [
+    {
+        "question": "What does CrossEntropyLoss expect as input?",
+        "options": [
             "Probabilities after softmax",
             "Raw logits (unnormalized scores)",
             "Binary values (0 or 1)",
             "One-hot encoded vectors"
         ],
-        correct_answer="Raw logits (unnormalized scores)",
-        explanation="CrossEntropyLoss expects raw logits and applies softmax internally for numerical stability. If you apply softmax yourself, the loss calculation will be incorrect."
-    ),
-
-    create_why_question(
-        concept="optimizer.zero_grad() before loss.backward()",
-        model_answer="We need to call zero_grad() before backward() because gradients accumulate by default in PyTorch. If we don't clear old gradients, they will add to the new gradients, causing incorrect weight updates and poor training results."
-    ),
-
-    QuizHandler.create_multiple_choice(
-        question_text="Which optimizer is most commonly used for training modern transformers?",
-        options=[
+        "correct": "Raw logits (unnormalized scores)",
+        "explanation": "CrossEntropyLoss expects raw logits and applies softmax internally for numerical stability. If you apply softmax yourself, the loss calculation will be incorrect."
+    },
+    {
+        "question": "What is the correct order of operations in the training loop?",
+        "options": [
+            "forward → backward → zero_grad → step",
+            "forward → loss → zero_grad → backward → step",
+            "zero_grad → forward → loss → step → backward",
+            "backward → zero_grad → forward → loss → step"
+        ],
+        "correct": "forward → loss → zero_grad → backward → step",
+        "explanation": "The correct order is: (1) forward pass to get predictions, (2) calculate loss, (3) zero_grad to clear old gradients, (4) backward to compute new gradients, (5) step to update weights."
+    },
+    {
+        "question": "Which optimizer is most commonly used for training modern transformers?",
+        "options": [
             "SGD",
             "SGD with momentum",
             "Adam",
             "AdamW"
         ],
-        correct_answer="AdamW",
-        explanation="AdamW (Adam with Weight Decay) is the standard optimizer for modern transformers like GPT, BERT, and LLaMA. It provides better regularization than plain Adam."
-    ),
-
-    create_definition_question(
-        term="learning rate",
-        correct_answer="The learning rate is a hyperparameter that controls the step size when updating model weights during training. It determines how much we adjust weights based on the calculated gradients. A higher learning rate means bigger steps (faster but less stable), while a lower learning rate means smaller steps (slower but more stable)."
-    ),
-
-    create_code_question(
-        task="Write the correct order of operations for one training step (using loss, optimizer, and model).",
-        model_answer="""# Correct order:
-outputs = model(inputs)         # Forward pass
-loss = loss_fn(outputs, targets) # Calculate loss
-optimizer.zero_grad()           # Clear old gradients
-loss.backward()                 # Compute gradients
-optimizer.step()                # Update weights"""
-    ),
-
-    QuizHandler.create_multiple_choice(
-        question_text="Which loss function should you use for predicting house prices?",
-        options=[
+        "correct": "AdamW",
+        "explanation": "AdamW (Adam with Weight Decay) is the standard optimizer for modern transformers like GPT, BERT, and LLaMA. It provides better regularization than plain Adam."
+    },
+    {
+        "question": "Which loss function should you use for predicting house prices?",
+        "options": [
             "CrossEntropyLoss",
             "MSELoss",
             "BCELoss",
             "NLLLoss"
         ],
-        correct_answer="MSELoss",
-        explanation="House price prediction is a regression task (predicting continuous values), so MSELoss (Mean Squared Error) is appropriate. CrossEntropyLoss and BCELoss are for classification tasks."
-    )
+        "correct": "MSELoss",
+        "explanation": "House price prediction is a regression task (predicting continuous values), so MSELoss (Mean Squared Error) is appropriate. CrossEntropyLoss and BCELoss are for classification tasks."
+    }
 ]
 
-def get_topic_content():
-    """Returns topic data as a dictionary"""
-    return {
-        'id': TOPIC_ID,
-        'title': TITLE,
-        'description': DESCRIPTION,
-        'content': CONTENT,
-        'questions': QUESTIONS
-    }
+for idx, q in enumerate(questions):
+    st.markdown(f"### Question {idx + 1}")
+    st.markdown(f"**{q['question']}**")
+
+    user_answer = st.radio(
+        "Select your answer:",
+        options=q["options"],
+        key=f"q{idx}",
+        index=None
+    )
+
+    if st.button(f"Check Answer {idx + 1}", key=f"btn{idx}"):
+        if user_answer:
+            if user_answer == q["correct"]:
+                st.success(f"✅ Correct! {q['explanation']}")
+            else:
+                st.error(f"❌ Incorrect. {q['explanation']}")
+        else:
+            st.warning("Please select an answer first!")
+
+    st.markdown("---")
+
+# Navigation
+st.info("👈 Use the sidebar to navigate to the next topic: **05 - Training Your First Model**")

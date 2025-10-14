@@ -1,14 +1,18 @@
 """
-Topic 3: Building Neural Networks (nn.Module)
+Topic 3: Building Neural Networks (nn.Module) - Basic Level
 """
 
-from utils.quiz_handler import QuizHandler, Question, QuestionType
+import streamlit as st
 
-TOPIC_ID = "03_neural_networks"
-TITLE = "Building Neural Networks"
-DESCRIPTION = "Learn how to build neural networks using PyTorch's nn.Module"
+# Page config
+st.set_page_config(
+    page_title="03 - Building Neural Networks",
+    page_icon="🧠",
+    layout="wide"
+)
 
-CONTENT = """
+# Main content
+st.markdown("""
 # Building Neural Networks (nn.Module) 🧠
 
 ## Why Do We Need nn.Module?
@@ -212,7 +216,7 @@ Every transformer is just a sophisticated `nn.Module` with many sub-modules!
 
 ---
 
-## Key Takeaways
+## Key Takeaways 💡
 
 ✅ `nn.Module` is the base class for ALL neural networks in PyTorch
 ✅ Define layers in `__init__()`, connect them in `forward()`
@@ -221,104 +225,86 @@ Every transformer is just a sophisticated `nn.Module` with many sub-modules!
 ✅ Call `model(x)` to get predictions (don't call `forward()` directly)
 
 **Connection to LLMs**: Every large language model (GPT, LLaMA, etc.) is built using this exact pattern! They're just much larger nn.Modules with specialized attention layers.
-"""
 
-# Create quiz questions
-def create_definition_question(term, correct_answer):
-    """Helper for open-ended definition questions"""
-    return Question(
-        question_type=QuestionType.OPEN_ENDED,
-        question_text=f"Explain what {term} is in your own words.",
-        correct_answer=correct_answer,
-        explanation=f"Model answer: {correct_answer}"
-    )
+---
 
-def create_why_question(concept, model_answer):
-    """Helper for 'why' questions"""
-    return Question(
-        question_type=QuestionType.OPEN_ENDED,
-        question_text=f"Why do we need {concept}?",
-        correct_answer=model_answer,
-        explanation=f"Model answer: {model_answer}"
-    )
+## Next Steps 🚀
 
-def create_code_question(task, model_answer):
-    """Helper for code-based questions"""
-    return Question(
-        question_type=QuestionType.OPEN_ENDED,
-        question_text=task,
-        correct_answer=model_answer,
-        explanation=f"Model answer: {model_answer}"
-    )
+Now you'll learn about **Loss Functions & Optimizers** - the components that actually make your neural network learn from data!
+""")
 
-QUESTIONS = [
-    QuizHandler.create_multiple_choice(
-        question_text="Which method must you implement when creating a custom nn.Module?",
-        options=[
+# Quiz section
+st.markdown("---")
+st.markdown("## 📝 Knowledge Check")
+
+questions = [
+    {
+        "question": "Which method must you implement when creating a custom nn.Module?",
+        "options": [
             "forward()",
             "backward()",
             "train()",
             "predict()"
         ],
-        correct_answer="forward()",
-        explanation="The forward() method defines how data flows through your network. PyTorch handles backward() automatically through autograd."
-    ),
-
-    QuizHandler.create_multiple_choice(
-        question_text="What does model.eval() do?",
-        options=[
+        "correct": "forward()",
+        "explanation": "The forward() method defines how data flows through your network. PyTorch handles backward() automatically through autograd."
+    },
+    {
+        "question": "What does model.eval() do?",
+        "options": [
             "Evaluates the model's performance",
             "Disables training-specific behaviors like dropout",
             "Calculates the loss function",
             "Saves the model to disk"
         ],
-        correct_answer="Disables training-specific behaviors like dropout",
-        explanation="model.eval() sets the model to evaluation mode, which disables dropout and changes batch normalization behavior. It doesn't evaluate performance - you still need to run forward passes and calculate metrics."
-    ),
-
-    create_why_question(
-        concept="super().__init__() at the beginning of __init__()",
-        model_answer="Calling super().__init__() initializes the parent nn.Module class, which sets up the internal infrastructure for automatic parameter tracking, device management, and other PyTorch features. Without it, your model won't work properly because PyTorch won't be able to track your layers and parameters."
-    ),
-
-    create_definition_question(
-        term="nn.Linear",
-        correct_answer="nn.Linear is a fully connected layer that performs a linear transformation: y = xW^T + b, where W is a weight matrix and b is a bias vector. It connects every input neuron to every output neuron."
-    ),
-
-    create_code_question(
-        task="Write the code to create a simple neural network with an input layer (10 features), one hidden layer (5 neurons with ReLU), and an output layer (2 classes).",
-        model_answer="""class SimpleNet(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc1 = nn.Linear(10, 5)
-        self.fc2 = nn.Linear(5, 2)
-
-    def forward(self, x):
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-        return x"""
-    ),
-
-    QuizHandler.create_multiple_choice(
-        question_text="Why don't we apply an activation function on the last layer of a classifier?",
-        options=[
+        "correct": "Disables training-specific behaviors like dropout",
+        "explanation": "model.eval() sets the model to evaluation mode, which disables dropout and changes batch normalization behavior. It doesn't evaluate performance - you still need to run forward passes and calculate metrics."
+    },
+    {
+        "question": "Why don't we apply an activation function on the last layer of a classifier?",
+        "options": [
             "It would make training slower",
             "The loss function applies the necessary transformation internally",
             "It would cause gradients to vanish",
             "Activation functions only work on hidden layers"
         ],
-        correct_answer="The loss function applies the necessary transformation internally",
-        explanation="For classification, loss functions like CrossEntropyLoss expect raw logits (unnormalized scores) and apply softmax internally for numerical stability. Applying softmax yourself would cause issues."
-    )
+        "correct": "The loss function applies the necessary transformation internally",
+        "explanation": "For classification, loss functions like CrossEntropyLoss expect raw logits (unnormalized scores) and apply softmax internally for numerical stability. Applying softmax yourself would cause issues."
+    },
+    {
+        "question": "When you call model(x), what actually happens?",
+        "options": [
+            "It trains the model",
+            "It calls model.forward(x) automatically",
+            "It calculates the loss",
+            "It updates the weights"
+        ],
+        "correct": "It calls model.forward(x) automatically",
+        "explanation": "PyTorch overrides the __call__ method to automatically invoke forward(). This is why we never call forward() directly - we just use model(x)."
+    }
 ]
 
-def get_topic_content():
-    """Returns topic data as a dictionary"""
-    return {
-        'id': TOPIC_ID,
-        'title': TITLE,
-        'description': DESCRIPTION,
-        'content': CONTENT,
-        'questions': QUESTIONS
-    }
+for idx, q in enumerate(questions):
+    st.markdown(f"### Question {idx + 1}")
+    st.markdown(f"**{q['question']}**")
+
+    user_answer = st.radio(
+        "Select your answer:",
+        options=q["options"],
+        key=f"q{idx}",
+        index=None
+    )
+
+    if st.button(f"Check Answer {idx + 1}", key=f"btn{idx}"):
+        if user_answer:
+            if user_answer == q["correct"]:
+                st.success(f"✅ Correct! {q['explanation']}")
+            else:
+                st.error(f"❌ Incorrect. {q['explanation']}")
+        else:
+            st.warning("Please select an answer first!")
+
+    st.markdown("---")
+
+# Navigation
+st.info("👈 Use the sidebar to navigate to the next topic: **04 - Loss Functions & Optimizers**")

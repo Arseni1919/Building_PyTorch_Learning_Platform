@@ -1,14 +1,18 @@
 """
-Topic 6: Evaluation & Metrics
+Topic 6: Evaluation & Metrics - Basic Level
 """
 
-from utils.quiz_handler import QuizHandler, Question, QuestionType
+import streamlit as st
 
-TOPIC_ID = "06_evaluation"
-TITLE = "Evaluation & Metrics"
-DESCRIPTION = "Learn how to properly evaluate model performance beyond accuracy"
+# Page config
+st.set_page_config(
+    page_title="06 - Evaluation & Metrics",
+    page_icon="✅",
+    layout="wide"
+)
 
-CONTENT = """
+# Main content
+st.markdown("""
 # Evaluation & Metrics ✅
 
 ## Why Accuracy Isn't Enough
@@ -149,6 +153,8 @@ Actual 0  95   3    2     (Class 0: 95 correct, 5 wrong)
 
 ## Complete Evaluation Function
 
+Here's a comprehensive evaluation function with all metrics:
+
 ```python
 import torch
 import numpy as np
@@ -158,9 +164,7 @@ from sklearn.metrics import (
 )
 
 def evaluate_model(model, test_loader, device, class_names=None):
-    """
-    Comprehensive model evaluation with all metrics
-    """
+    \"\"\"Comprehensive model evaluation with all metrics\"\"\"
     model.eval()
     all_preds = []
     all_labels = []
@@ -172,7 +176,7 @@ def evaluate_model(model, test_loader, device, class_names=None):
 
             # Get predictions
             outputs = model(inputs)
-            probs = torch.softmax(outputs, dim=1)  # Convert to probabilities
+            probs = torch.softmax(outputs, dim=1)
             _, preds = torch.max(outputs, 1)
 
             # Store results
@@ -202,13 +206,13 @@ def evaluate_model(model, test_loader, device, class_names=None):
 
     # Detailed classification report
     if class_names:
-        print("\nPer-Class Metrics:")
+        print("\\nPer-Class Metrics:")
         print(classification_report(all_labels, all_preds,
                                    target_names=class_names))
 
     # Confusion matrix
     cm = confusion_matrix(all_labels, all_preds)
-    print("\nConfusion Matrix:")
+    print("\\nConfusion Matrix:")
     print(cm)
 
     return {
@@ -266,7 +270,7 @@ Per-Class Metrics:
 
 ```python
 def analyze_worst_classes(results, class_names):
-    """Find classes with lowest F1 scores"""
+    \"\"\"Find classes with lowest F1 scores\"\"\"
     from sklearn.metrics import f1_score
 
     per_class_f1 = []
@@ -338,7 +342,7 @@ print(f"MAE: {mae.item():.4f}")
 
 ```python
 def analyze_confidence(model, test_loader, device):
-    """Analyze prediction confidence"""
+    \"\"\"Analyze prediction confidence\"\"\"
     model.eval()
     confidences = []
 
@@ -360,31 +364,13 @@ def analyze_confidence(model, test_loader, device):
 
     # Find low-confidence predictions (uncertain)
     low_conf = confidences < 0.5
-    print(f"Low confidence predictions: {low_conf.sum()} ({low_conf.sum()/len(confidences)*100:.2f}%)")
+    print(f"Low confidence predictions: {low_conf.sum()} "
+          f"({low_conf.sum()/len(confidences)*100:.2f}%)")
 
 analyze_confidence(model, test_loader, device)
 ```
 
 **Why this matters**: Low confidence predictions might need human review in production!
-
----
-
-## Cross-Validation (Advanced Preview)
-
-For small datasets, use k-fold cross-validation:
-
-```python
-from sklearn.model_selection import KFold
-
-kfold = KFold(n_splits=5, shuffle=True)
-
-for fold, (train_idx, val_idx) in enumerate(kfold.split(dataset)):
-    print(f"Training fold {fold + 1}/5...")
-    # Train on train_idx, evaluate on val_idx
-    # Average results across all folds
-```
-
-**Why**: More reliable performance estimate when you have limited data.
 
 ---
 
@@ -417,7 +403,7 @@ def evaluate_lm(model, val_loader):
 
 ---
 
-## Key Takeaways
+## Key Takeaways 💡
 
 ✅ **Accuracy alone is misleading** for imbalanced datasets
 ✅ Use **precision, recall, F1** for per-class performance
@@ -426,112 +412,98 @@ def evaluate_lm(model, val_loader):
 ✅ Analyze **per-class performance** to find weak spots
 ✅ Check **prediction confidence** to identify uncertain predictions
 
-**Congratulations!** You've completed the Basic Level! You now understand:
+**Congratulations!** You've completed the Basic Level! 🎉 You now understand:
 - PyTorch tensors and autograd
 - Building neural networks with nn.Module
 - Loss functions and optimizers
 - Training and evaluation
+- Comprehensive model metrics
 
-**Next**: Move to Intermediate Level to learn about real-world datasets, CNNs, and transfer learning!
-"""
+---
 
-# Create quiz questions
-def create_definition_question(term, correct_answer):
-    """Helper for open-ended definition questions"""
-    return Question(
-        question_type=QuestionType.OPEN_ENDED,
-        question_text=f"Explain what {term} is in your own words.",
-        correct_answer=correct_answer,
-        explanation=f"Model answer: {correct_answer}"
-    )
+## Next Steps 🚀
 
-def create_why_question(concept, model_answer):
-    """Helper for 'why' questions"""
-    return Question(
-        question_type=QuestionType.OPEN_ENDED,
-        question_text=f"Why {concept}?",
-        correct_answer=model_answer,
-        explanation=f"Model answer: {model_answer}"
-    )
+**You're ready for Intermediate Level!** Move on to learn about:
+- Custom datasets and data loaders
+- Convolutional Neural Networks (CNNs)
+- Batch normalization and dropout
+- Transfer learning
+- And more!
+""")
 
-def create_code_question(task, model_answer):
-    """Helper for code-based questions"""
-    return Question(
-        question_type=QuestionType.OPEN_ENDED,
-        question_text=task,
-        correct_answer=model_answer,
-        explanation=f"Model answer: {model_answer}"
-    )
+# Quiz section
+st.markdown("---")
+st.markdown("## 📝 Knowledge Check")
 
-QUESTIONS = [
-    QuizHandler.create_multiple_choice(
-        question_text="Why is accuracy not enough for imbalanced datasets?",
-        options=[
+questions = [
+    {
+        "question": "Why is accuracy not enough for imbalanced datasets?",
+        "options": [
             "It takes too long to calculate",
             "It can be misleading - a model predicting only the majority class can have high accuracy",
             "It doesn't work with neural networks",
             "It requires too much memory"
         ],
-        correct_answer="It can be misleading - a model predicting only the majority class can have high accuracy",
-        explanation="For imbalanced datasets (e.g., 99% class A, 1% class B), a model that always predicts class A gets 99% accuracy but is useless for detecting class B. That's why we need metrics like precision, recall, and F1-score."
-    ),
-
-    create_definition_question(
-        term="precision",
-        correct_answer="Precision measures what proportion of positive predictions were actually correct. It answers the question: 'Of all the samples I predicted as positive, how many were truly positive?' Formula: True Positives / (True Positives + False Positives). High precision means few false positives."
-    ),
-
-    create_definition_question(
-        term="recall",
-        correct_answer="Recall measures what proportion of actual positive samples were correctly identified. It answers: 'Of all the actual positive samples, how many did I find?' Formula: True Positives / (True Positives + False Negatives). High recall means few false negatives (missed cases)."
-    ),
-
-    QuizHandler.create_multiple_choice(
-        question_text="What does a confusion matrix show?",
-        options=[
+        "correct": "It can be misleading - a model predicting only the majority class can have high accuracy",
+        "explanation": "For imbalanced datasets (e.g., 99% class A, 1% class B), a model that always predicts class A gets 99% accuracy but is useless for detecting class B. That's why we need metrics like precision, recall, and F1-score."
+    },
+    {
+        "question": "What does a confusion matrix show?",
+        "options": [
             "Only the incorrect predictions",
             "The training loss over time",
             "All predictions vs actual labels in a table format",
             "The model's confidence scores"
         ],
-        correct_answer="All predictions vs actual labels in a table format",
-        explanation="A confusion matrix shows how many samples of each actual class were predicted as each possible class. The diagonal shows correct predictions, and off-diagonal cells show specific types of errors (e.g., how many class 0 samples were misclassified as class 1)."
-    ),
-
-    create_why_question(
-        concept="should we use F1-score instead of looking at precision and recall separately",
-        model_answer="F1-score combines precision and recall into a single metric using their harmonic mean. This is useful because: (1) it provides a single number for model comparison, (2) it balances both metrics - a model needs both good precision AND good recall to have a high F1, (3) it penalizes extreme imbalances (e.g., 100% precision but 10% recall gives low F1). However, in some applications you might care more about one metric than the other."
-    ),
-
-    create_code_question(
-        task="Write code to calculate accuracy, precision, recall, and F1-score given two arrays: true_labels and predicted_labels (use sklearn).",
-        model_answer="""from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
-accuracy = accuracy_score(true_labels, predicted_labels)
-precision = precision_score(true_labels, predicted_labels, average='weighted')
-recall = recall_score(true_labels, predicted_labels, average='weighted')
-f1 = f1_score(true_labels, predicted_labels, average='weighted')"""
-    ),
-
-    QuizHandler.create_multiple_choice(
-        question_text="When analyzing a confusion matrix, where do correct predictions appear?",
-        options=[
+        "correct": "All predictions vs actual labels in a table format",
+        "explanation": "A confusion matrix shows how many samples of each actual class were predicted as each possible class. The diagonal shows correct predictions, and off-diagonal cells show specific types of errors."
+    },
+    {
+        "question": "When analyzing a confusion matrix, where do correct predictions appear?",
+        "options": [
             "In the top row",
             "In the right column",
             "On the diagonal (top-left to bottom-right)",
             "In the bottom-left corner"
         ],
-        correct_answer="On the diagonal (top-left to bottom-right)",
-        explanation="Correct predictions appear on the diagonal because that's where the actual class equals the predicted class (e.g., actual=0 and predicted=0, actual=1 and predicted=1, etc.). Off-diagonal elements represent misclassifications."
-    )
+        "correct": "On the diagonal (top-left to bottom-right)",
+        "explanation": "Correct predictions appear on the diagonal because that's where the actual class equals the predicted class (e.g., actual=0 and predicted=0, actual=1 and predicted=1, etc.)."
+    },
+    {
+        "question": "What does precision measure?",
+        "options": [
+            "How many actual positives were found",
+            "What proportion of positive predictions were correct",
+            "The overall accuracy of the model",
+            "The training time"
+        ],
+        "correct": "What proportion of positive predictions were correct",
+        "explanation": "Precision measures what proportion of positive predictions were actually correct. Formula: True Positives / (True Positives + False Positives). High precision means few false positives."
+    }
 ]
 
-def get_topic_content():
-    """Returns topic data as a dictionary"""
-    return {
-        'id': TOPIC_ID,
-        'title': TITLE,
-        'description': DESCRIPTION,
-        'content': CONTENT,
-        'questions': QUESTIONS
-    }
+for idx, q in enumerate(questions):
+    st.markdown(f"### Question {idx + 1}")
+    st.markdown(f"**{q['question']}**")
+
+    user_answer = st.radio(
+        "Select your answer:",
+        options=q["options"],
+        key=f"q{idx}",
+        index=None
+    )
+
+    if st.button(f"Check Answer {idx + 1}", key=f"btn{idx}"):
+        if user_answer:
+            if user_answer == q["correct"]:
+                st.success(f"✅ Correct! {q['explanation']}")
+            else:
+                st.error(f"❌ Incorrect. {q['explanation']}")
+        else:
+            st.warning("Please select an answer first!")
+
+    st.markdown("---")
+
+# Navigation
+st.success("🎉 **Congratulations!** You've completed all Basic Level topics!")
+st.info("👈 Continue to **Intermediate Level** (Topics 07-13) in the sidebar!")
