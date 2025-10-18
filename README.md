@@ -1,4 +1,4 @@
-# PyTorch Mastery Course: From Beginner to Advanced
+# PyTorch Mastery Course: From Beginner to Advanced (by Claude Code)
 
 A comprehensive, hands-on PyTorch course that takes you from fundamentals to state-of-the-art techniques through practical coding exercises. Learn by building, understanding the "why" behind every concept, and connecting the dots across the deep learning ecosystem.
 
