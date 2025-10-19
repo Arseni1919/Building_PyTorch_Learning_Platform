@@ -3,4 +3,6 @@ name = "building-pytorch-learning-platform"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "scikit-learn>=1.7.2",
+]
