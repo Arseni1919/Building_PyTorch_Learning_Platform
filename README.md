@@ -317,7 +317,7 @@ This course incorporates the latest research and best practices from the PyTorch
 > 
 > #### Prompt:
 
-```txt
+```text
 PyTorch Mastery Course
 
 I want to become fluent in PyTorch through hands-on experience. Please create a comprehensive, practical course that takes me from beginner to advanced level with real coding exercises.
